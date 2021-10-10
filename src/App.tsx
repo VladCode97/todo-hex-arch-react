@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from 'react';
+import {container} from "./core/dependency-injection/container";
+import {GetAllAchievementsQuery} from "./feature/achievements/application/get-all-achievements-query";
+import Achievement from "./feature/achievements/domain/models/achievements";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [achievements, setAchievements] = useState<Achievement[]>();
+    const getData = async () => {
+        const getAllAchievementsQuery = container.resolve(GetAllAchievementsQuery);
+        const results = await getAllAchievementsQuery.execute();
+        setAchievements(results);
+    }
+    useEffect(() => {
+        getData();
+    }, [])
+    return (
+        <div className="App">
+            {
+                achievements?.map((a) =>
+                    <>
+                        <h5>{a.id}</h5>
+                        <h5>{a.name}</h5>
+                        <p>{new Date(a.date).toLocaleDateString()}</p>
+                    </>
+                )
+            }
+        </div>
+    );
 }
 
 export default App;
